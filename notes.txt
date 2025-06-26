@@ -1,0 +1,14 @@
+Necessary to back adjust prices for dividends and interest since that change isn't loss but what we get credited in account (Panama method)
+Sharpe involves subtract risk free rate
+Sharpe divides by std which penalizes high returns vol as well
+Sortino can be used to check the negative skew
+Both sharpe and sortino are important
+Instead of max draw down average drawdown can be preferred
+Since returns are definitely fat tailed its better to model accordingly
+For checking fat tailed natures its better to use lower percentile ratio and upper percentile ratio rather than kurtosis
+
+
+Annualization of daily std only work if no auto correlation between returns otherwise spurious returns but still can be used for our cases generally
+
+Futures:
+Safe to back fill mini future prices before 2019 when testing for micro ones

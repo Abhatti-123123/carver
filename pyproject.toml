@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "futures_trend"
+version = "0.1.0"
+description = "Cross-asset futures trend prototype"
+authors = [{name = "Angad Bhatti"}]
+requires-python = ">=3.11"
+dependencies = [
+  "pandas>=1.5",
+  "numpy>=1.21",
+  "nasdaq-data-link"
+]
+
+# ----------  tell setuptools how to find packages  ----------
+[tool.setuptools]
+package-dir = {"" = "src"}                 # code lives under src/
+
+[tool.setuptools.packages.find]
+where   = ["src"]                          # search only in src/
+include = ["*"]    # expose these two pkgs
+exclude = ["tests*", "scripts*", "data*"]           # ignore anything else

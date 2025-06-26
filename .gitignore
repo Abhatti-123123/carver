@@ -1,0 +1,10 @@
+*.pdf
+*.csv
+*.par*
+api.py
+*.pyc
+*.py[cod]
+*$py.class
+*.pyc
+/__pycache__/*
+__pycache__/
