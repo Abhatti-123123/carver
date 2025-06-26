@@ -1,0 +1,15 @@
+pyproject.toml
+src/__init__.py
+src/config/__init__.py
+src/config/api.py
+src/config/base.py
+src/config/universe.py
+src/futures_trend.egg-info/PKG-INFO
+src/futures_trend.egg-info/SOURCES.txt
+src/futures_trend.egg-info/dependency_links.txt
+src/futures_trend.egg-info/requires.txt
+src/futures_trend.egg-info/top_level.txt
+src/lib/__init__.py
+src/lib/adjust.py
+src/lib/filters.py
+src/lib/loaders.py
