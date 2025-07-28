@@ -30,6 +30,7 @@ YF_TICKERS = [
     "GC=F",   # Gold futures
     "KC=F",   # Coffee futures
     "SB=F",   # Sugar futures
+    "NG=F"    # Natural gas futures
 ]
 # YF_TICKERS = [
 #     "ZB=F",   # E-mini S&P 500 futures      :contentReference[oaicite:0]{index=0}

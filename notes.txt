@@ -7,8 +7,35 @@ Instead of max draw down average drawdown can be preferred
 Since returns are definitely fat tailed its better to model accordingly
 For checking fat tailed natures its better to use lower percentile ratio and upper percentile ratio rather than kurtosis
 
+###If we do equal weighting when calculating standard deviation; If there was a large return28 days back; it would cause a large jump in std when it goes out of the window causing fake vol display. (Good to use exponential weighted average instead) (lambda 0.6 is optimal refer Carver pg 99)
+###Std clusters in short run but mean reverts in long run
+For predicting future vol: its good to blend between short run vol and long run vol so as not to have big weights during crisis
+
+
 
 Annualization of daily std only work if no auto correlation between returns otherwise spurious returns but still can be used for our cases generally
 
 Futures:
 Safe to back fill mini future prices before 2019 when testing for micro ones
+
+Instruments  that  are  riskier  will  usually  have  higher  initial  margin
+requirements, so we’d need more cash to start trading them. They also have
+the potential for larger losses once we’re holding them, requiring more cash
+to cover these losses in the form of variation margin.
+
+Efficient portofolio optimization is only necessary when we dont have access to leverage to tweak the risk
+
+For covariance calculation long term covariance is preferred because they are more stable atleast 20 days
+
+Ratios:
+
+leverage ratio = Volatility ratio = total risk apetite / risk on single contract = portfolio loss% / 1 contract loss%
+contract leverage ratio = notional exposure per contract / capital
+
+leverage = capital wiped / move in the contract
+
+
+Kelly optimal risk is theoritically equal to strategies sharpe ratio
+Generally target risk should be half of optimal risk
+
+Its important to keep intital weights when the look back values are not set to 1 to keep the intital trades from blowing up. Or maybe no trades until look back values setup

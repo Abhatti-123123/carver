@@ -10,8 +10,8 @@ def main():
     print(df.info(), "\n")
     
     # 3) peek at the edges
-    print("First 5 rows:\n", df.head(), "\n")
-    print("Last 5 rows:\n", df.tail(), "\n")
+    print("First 5 rows:\n", df.head(20), "\n")
+    print("Last 5 rows:\n", df.tail(20), "\n")
     
     # 4) count non-null per column
     print("Non-null counts per contract:\n", df.count())

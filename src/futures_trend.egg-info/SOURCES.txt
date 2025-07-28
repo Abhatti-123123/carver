@@ -11,5 +11,11 @@ src/futures_trend.egg-info/requires.txt
 src/futures_trend.egg-info/top_level.txt
 src/lib/__init__.py
 src/lib/adjust.py
+src/lib/analyse_data.py
 src/lib/filters.py
 src/lib/loaders.py
+src/lib/backtester/backtester.py
+src/lib/strat/buy_n_hold.py
+src/lib/strat/risk_scaled_strategy.py
+src/lib/strat/strategy_base.py
+src/lib/strat/variable_risk_scaled_strategy.py
