@@ -41,6 +41,19 @@ def macd_signal(
     slow    = returns.ewm(alpha=slow_lambda, adjust=False).mean()
     return fast - slow
 
+def macd_signal_prices(
+    prices: pd.DataFrame | pd.Series,
+    fast_lambda: float = DEFAULT_FAST_LAMBDA,
+    slow_lambda: float = DEFAULT_SLOW_LAMBDA,
+) -> pd.DataFrame | pd.Series:
+    """Return the signed MACD series (+/-) for each column of *prices*.
+
+    Positive values imply upward trend, negative values downward.
+    The magnitude can be interpreted as MACD strength in percent terms.
+    """
+    fast = prices.ewm(alpha=fast_lambda, adjust=False).mean()
+    slow = prices.ewm(alpha=slow_lambda, adjust=False).mean()
+    return fast - slow
 
 def trend_mask(
     prices: pd.DataFrame | pd.Series,
@@ -56,7 +69,7 @@ def trend_mask(
     """
     macd = macd_signal(prices, fast_lambda, slow_lambda)
     mask = pd.DataFrame(index=macd.index, columns=macd.columns)
-    mask[macd >  threshold] = 1
-    mask[macd < -threshold] = 0
+    mask[macd >  0] = 1
+    mask[macd < -0.3] = -1
     mask = mask.fillna(0)
     return mask.astype(int)

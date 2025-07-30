@@ -8,6 +8,13 @@ def main(start: str, end: str, tc: float,
     strategy_cls = STRATEGY_REGISTRY[strategy_name]
     strat        = strategy_cls()
     price_df     = pd.read_parquet("data/panel.parquet")
+    # Drop columns with >10% NaNs
+    threshold = 0.10  # 10%
+    valid_cols = price_df.columns[price_df.isnull().mean() <= threshold]
+    price_df = price_df[valid_cols]
+
+    # Forward-fill remaining NaNs (e.g., from weekends or illiquid assets)
+    price_df = price_df.ffill()
 
     # no column loop — pass full panel into signal generator
     signals      = strat.generate_signals(price_df)

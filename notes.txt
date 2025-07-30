@@ -39,3 +39,8 @@ Kelly optimal risk is theoritically equal to strategies sharpe ratio
 Generally target risk should be half of optimal risk
 
 Its important to keep intital weights when the look back values are not set to 1 to keep the intital trades from blowing up. Or maybe no trades until look back values setup
+Trend indicators like macd do much better for long positions, We should not go short with them and instead use them to close our the position
+The sizing should be done with volatility not confidence score for better results and lower risk. This is will give better sharpe throughout
+Higher sharpe is better than higher returns, since strategies with higher sharpe can be leveraged more safely for higher returns
+
+To get meaningful indicator value through history we need to adjust for risk and trading price

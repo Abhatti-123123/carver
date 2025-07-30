@@ -45,7 +45,7 @@ class MultiAssetStrategyBase(StrategyBase):
         blended_vol = 0.7 * sigma_fast + 0.3 * sigma_slow
 
         raw_positions = (1 / blended_vol).clip(upper=7.0)
-        return raw_positions.ffill()
+        return raw_positions.ffill().fillna(0.0)
 
     def compute_portfolio_vol(self, weights, cov_matrix):
         """
