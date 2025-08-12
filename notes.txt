@@ -23,24 +23,29 @@ requirements, so we’d need more cash to start trading them. They also have
 the potential for larger losses once we’re holding them, requiring more cash
 to cover these losses in the form of variation margin.
 
-Efficient portofolio optimization is only necessary when we dont have access to leverage to tweak the risk
+Efficient portfolio optimization is only necessary when we don't have access to leverage to tweak the risk
 
-For covariance calculation long term covariance is preferred because they are more stable atleast 20 days
+For covariance calculation long term covariance is preferred because they are more stable at least 20 days
 
 Ratios:
 
-leverage ratio = Volatility ratio = total risk apetite / risk on single contract = portfolio loss% / 1 contract loss%
+leverage ratio = Volatility ratio = total risk appetite / risk on single contract = portfolio loss% / 1 contract loss%
 contract leverage ratio = notional exposure per contract / capital
 
 leverage = capital wiped / move in the contract
 
 
-Kelly optimal risk is theoritically equal to strategies sharpe ratio
+Kelly optimal risk is theoretically equal to strategies sharpe ratio
 Generally target risk should be half of optimal risk
 
-Its important to keep intital weights when the look back values are not set to 1 to keep the intital trades from blowing up. Or maybe no trades until look back values setup
+Its important to keep initial weights when the look back values are not set to 1 to keep the initial trades from blowing up. Or maybe no trades until look back values setup
 Trend indicators like macd do much better for long positions, We should not go short with them and instead use them to close our the position
 The sizing should be done with volatility not confidence score for better results and lower risk. This is will give better sharpe throughout
 Higher sharpe is better than higher returns, since strategies with higher sharpe can be leveraged more safely for higher returns
-
+Capping the extreme values of indicator output is very important to avoid blowing up cause those are times when there might be quick reversal
+But capping also leads to loss of magnitude differences in values greater then the cap so wherever possible min-max scaling is better than caping unless the extreme values are ridiculous.
+We should also include reversal probabilities to sizing logic to reduces blowing up account due to fluctuation
 To get meaningful indicator value through history we need to adjust for risk and trading price
+
+Equity and commodities generally have sharp bounce back after strong negative trend vice versa not true
+VIX generally have sharp fall after strong positive trend vice verca not true

@@ -28,7 +28,7 @@ def main(start: str, end: str, tc: float,
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser("Run portfolio-level strategy")
-    p.add_argument("--start",   default="2020-01-01")
+    p.add_argument("--start",   default="2000-01-01")
     p.add_argument("--end",     default="2021-01-01")
     p.add_argument("--tc",      default=0.0005, type=float)
     p.add_argument("--strategy", default="portfolio_risk_scaled",

@@ -9,7 +9,7 @@ from lib.indicators.trending_indicator import trend_mask, macd_signal, macd_sign
 
 #This follows dynamic positioning, even after trend starts the position will be continued to change according to the volatility
 class PortfolioRiskScaledStrategy(MultiAssetStrategyBase):
-    def __init__(self, target_vol=0.20, short_lookback=20, long_lookback=60, lambda_=0.5, rebalance=False, trend_mode: str = "strength"): #Traget vol can be easily half of the expected sharpe
+    def __init__(self, target_vol=0.60, short_lookback=20, long_lookback=60, lambda_=0.5, rebalance=True, trend_mode: str = "mask"): #Traget vol can be easily half of the expected sharpe
         #When I increased target vol from 20% to 40% the returns and cagr increase signififcantly with minimum change in vol, mdd and sharpe
         #Follow trend improves overall algororithm
         super().__init__()
@@ -100,9 +100,10 @@ class PortfolioRiskScaledStrategy(MultiAssetStrategyBase):
         if self.trend_mode == "strength":
             forecast_df = self._trend_strength_forecast(prices) / 10
             rel_change = (forecast_df - forecast_df.shift(1)).abs() / (forecast_df.shift(1).abs() + 1e-12)
-            update_mask = rel_change > 0.05
+            update_mask = rel_change > 0.10
 
             new_positions = positions.copy()
+            new_positions.iloc[0] = positions.iloc[0] * forecast_df.iloc[0]
             for col in positions.columns:
                 for t in range(1, len(positions)):
                     col_idx = positions.columns.get_loc(col)
@@ -114,8 +115,6 @@ class PortfolioRiskScaledStrategy(MultiAssetStrategyBase):
                         new_positions.iloc[t, col_idx] = new_positions.iloc[t-1, col_idx]
             positions = new_positions
 
-
-        print(positions)
         return positions.fillna(0.0).ffill()
 
     def _equity_over_time(self, t, positions, prices, initial_capital):
@@ -151,7 +150,6 @@ class PortfolioRiskScaledStrategy(MultiAssetStrategyBase):
 
         # ---------- Step‑3 : scale and clip ----------
         forecast = (z)             # linear scaling
-        print(forecast.mean().abs().mean())
         forecast = forecast.clip(-self._FORECAST_CAP, self._FORECAST_CAP)
 
         return forecast.fillna(0.0).astype(float)
