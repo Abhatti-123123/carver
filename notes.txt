@@ -49,3 +49,25 @@ To get meaningful indicator value through history we need to adjust for risk and
 
 Equity and commodities generally have sharp bounce back after strong negative trend vice versa not true
 VIX generally have sharp fall after strong positive trend vice verca not true
+
+
+
+Strategy Selection:
+Selecting a strategy based on back test results is fitting the sample. We should start with a blended strategy then slowly reduces the weightage of inefficient strat.
+Fitting to a sample is very dangerous because it might lead to picking a strat that worked because a policy or market condition was favoring it which need not be true in future.
+If the results cant be explained logically and financially then high chances are it is data mining and shouldn't be trusted even if statistically significant.
+To get actual results regress it against results of trend results and get alpha.
+Annualization after calculating daily values is more robust but can be incorrect because of autocorrelation in data (relation between data points)
+###Annualization assumes each data point is independent of other
+Negative skew means risky strategy: More frequent positive returns but big negatives. Because of risk we expect higher returns to explain. (We can work towards identifying negative skew in advance and avoid losses)
+
+
+
+ASSUMPTION IN CODE:
+Capital = Price * Multiplier always
+Check for compounding in capital logic for size allocation vs in back test
+
+
+Major risk:
+We tend to have very large positions in the quiet periods just before market crises occur. Not a good idea
+

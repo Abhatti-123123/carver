@@ -9,7 +9,7 @@ from lib.indicators.trending_indicator import trend_mask, macd_signal, macd_sign
 
 #This follows dynamic positioning, even after trend starts the position will be continued to change according to the volatility
 class PortfolioRiskScaledStrategy(MultiAssetStrategyBase):
-    def __init__(self, target_vol=0.60, short_lookback=20, long_lookback=60, lambda_=0.5, rebalance=True, trend_mode: str = "mask"): #Traget vol can be easily half of the expected sharpe
+    def __init__(self, target_vol=0.60, short_lookback=20, long_lookback=60, lambda_=0.5, rebalance=True, trend_mode: str = "strength"): #Traget vol can be easily half of the expected sharpe
         #When I increased target vol from 20% to 40% the returns and cagr increase signififcantly with minimum change in vol, mdd and sharpe
         #Follow trend improves overall algororithm
         super().__init__()
@@ -54,6 +54,17 @@ class PortfolioRiskScaledStrategy(MultiAssetStrategyBase):
 
                 positions.iloc[t] = w0
                 continue
+            # w0 = raw_weights.iloc[t].copy()
+            # # ── normalise so |weights| sum to 1 ─────────────────────────  Very crucial to improce results...put in notes
+            # nom = w0.abs().sum()
+            # if nom > 0:
+            #     w0 = w0 / nom
+            # else:
+            #     w0[:] = 0.0          # all NaN or zero ‑‑ stay flat
+
+            # # optional: respect per‑asset leverage cap
+            # w_t = w0.clip(upper=1.0)  # or your chosen cap
+
             short_cov = returns.iloc[t - self.short_lookback:t].cov()
             long_cov = returns.iloc[t - self.long_lookback:t].cov()
 
@@ -100,7 +111,7 @@ class PortfolioRiskScaledStrategy(MultiAssetStrategyBase):
         if self.trend_mode == "strength":
             forecast_df = self._trend_strength_forecast(prices) / 10
             rel_change = (forecast_df - forecast_df.shift(1)).abs() / (forecast_df.shift(1).abs() + 1e-12)
-            update_mask = rel_change > 0.10
+            update_mask = rel_change > 0.05
 
             new_positions = positions.copy()
             new_positions.iloc[0] = positions.iloc[0] * forecast_df.iloc[0]
@@ -109,7 +120,7 @@ class PortfolioRiskScaledStrategy(MultiAssetStrategyBase):
                     col_idx = positions.columns.get_loc(col)
                     if update_mask.iloc[t, col_idx]:
                         # Update to the *new* value based on forecast
-                        new_positions.iloc[t, col_idx] = raw_weights.iloc[t, col_idx] * forecast_df.iloc[t, col_idx] / 10
+                        new_positions.iloc[t, col_idx] = positions.iloc[t, col_idx] * forecast_df.iloc[t, col_idx]
                     else:
                         # Hold previous position
                         new_positions.iloc[t, col_idx] = new_positions.iloc[t-1, col_idx]
@@ -119,8 +130,16 @@ class PortfolioRiskScaledStrategy(MultiAssetStrategyBase):
 
     def _equity_over_time(self, t, positions, prices, initial_capital):
         # Approximate portfolio equity up to time t for rebalancing
-        pnl = ((positions.shift(1) * prices.pct_change(fill_method=None).fillna(0.0)).iloc[:t]).sum(axis=1)
-        return initial_capital + pnl.sum()
+        # pnl = ((positions.shift(1) * prices.pct_change(fill_method=None).fillna(0.0)).iloc[:t]).sum(axis=1)
+        # return initial_capital + pnl.sum()
+        # daily % returns per asset
+        rets = prices.pct_change(fill_method=None).fillna(0.0)
+        # # portfolio daily return (weights × returns), use yesterday’s weights
+        port_ret = (positions.shift(1) * rets).sum(axis=1)
+        if t <= 1:
+            return float(initial_capital)
+        equity_path = (1.0 + port_ret.iloc[:t]).cumprod()
+        return float(initial_capital * equity_path.iloc[-1])
 
     def _trend_strength_forecast(self, prices: pd.DataFrame) -> pd.DataFrame:
         """
