@@ -9,7 +9,7 @@ from lib.indicators.trending_indicator import trend_mask, macd_signal, macd_sign
 
 #This follows dynamic positioning, even after trend starts the position will be continued to change according to the volatility
 class PortfolioRiskScaledStrategy(MultiAssetStrategyBase):
-    def __init__(self, target_vol=0.60, short_lookback=20, long_lookback=60, lambda_=0.5, rebalance=True, trend_mode: str = "strength"): #Traget vol can be easily half of the expected sharpe
+    def __init__(self, target_vol=0.3, short_lookback=20, long_lookback=60, lambda_=0.5, rebalance=True, trend_mode: str = "mask"): #Traget vol can be easily half of the expected sharpe
         #When I increased target vol from 20% to 40% the returns and cagr increase signififcantly with minimum change in vol, mdd and sharpe
         #Follow trend improves overall algororithm
         super().__init__()
