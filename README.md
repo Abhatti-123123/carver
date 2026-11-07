@@ -11,6 +11,8 @@ Finance data: 31 liquid futures, 2005 – mid-2025, 5 bp cost per unit of positi
 | Since 2020 | 1.48 | 19.8% | 12.7% | −13.0% |
 
 Trend-strength sizing adds 0.44% a month over the risk-scaled portfolio (t = 3.13, HAC).
+High market-wide long memory (dLTM) predicts a fatter left tail for the book: next-month skew -1.42 vs -0.43;
+halving exposure in high-memory states cuts the 2013-25 max drawdown from -26.9% to -16.9% at equal or better Sharpe.
 Presentation: `carver_presentation.pptx`.
 
 ## The strategies
@@ -35,7 +37,8 @@ python scripts/run_results.py --data data --out results/final.json              
 python scripts/select_settings.py --panel data/panel_31.parquet                  # how the settings were chosen (2005-16 only)
 python scripts/build_panel.py --universe crypto --start 2023-01-01 --end 2025-11-28 --out data/panel_crypto.parquet
 python scripts/crypto_run.py --panel data/panel_crypto.parquet
-python scripts/dltm_app1.py --dltm <folder with d* series>                       # dLTM extension
+python scripts/dltm_market_state.py --dltm <folder with d* series>              # market memory -> next-month tail of the futures book
+python scripts/dltm_app1.py --dltm <folder with d* series>                       # dLTM sizing on 30 S&P 500 stocks
 python scripts/build_presentation.py carver_presentation.pptx
 ```
 

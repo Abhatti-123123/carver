@@ -5,6 +5,8 @@ dLTM extension: size the final system by each stock's long-memory regime.
 Universe: sector-balanced 30-name S&P 500 set (3 names x 10 sectors; 15+ years of history and 50%+ dLTM
 coverage; the sector with fewest eligible names is dropped, ties broken by coverage, history, ticker).
 Overlay: position x1.5 when the walk-forward d* >= 0.7, x0.5 when d* < 0.3, unchanged otherwise.
+Because high-d names far outnumber low-d ones the overlay adds leverage, so a leverage-neutral tilt
+(multipliers rescaled to average 1 across names each day) is reported alongside it.
 Test: Diebold-Mariano on the daily return differential, Newey-West bandwidth 21.
 
 Inputs (--dltm folder): log_prices_sp500_2010_2025.parquet, gics_map.json, series_14y_est_n2800/<TICKER>_n2800_series.parquet
@@ -81,13 +83,19 @@ if __name__ == "__main__":
     sig = PortfolioRiskScaledStrategy().generate_signals(px)
     base, _ = backtest_multi_asset(px, sig, TRANSACTION_COST)
     over, _ = backtest_multi_asset(px, sig * mult, TRANSACTION_COST)
+    # leverage-neutral version: multipliers rescaled to average 1 across names each day (tilt only)
+    tilt, _ = backtest_multi_asset(px, sig * mult.div(mult.mean(axis=1), axis=0), TRANSACTION_COST)
     pre, post = slice(None, live - pd.Timedelta(days=1)), slice(live, None)
     k = base.loc[post].std() / over.loc[post].std()                # overlay de-levered to the base's vol after 2011
     dm, pv = dm_test(over, base)
     out = {"universe": uni.to_dict("records"), "dltm_live_from": str(live.date()),
            "share_high_d": float((d >= D_HIGH).stack().mean()), "share_low_d": float((d < D_LOW).stack().mean()),
            "base": perf(base), "overlay": perf(over),
-           "live_sharpe": {"base": sharpe(base.loc[post]), "overlay": sharpe(over.loc[post])},
+           "live_sharpe": {"base": sharpe(base.loc[post]), "overlay": sharpe(over.loc[post]),
+                           "neutral_tilt": sharpe(tilt.loc[post])},
+           "live_vol": {k: float(x.loc[post].std() * np.sqrt(252)) for k, x in
+                        (("base", base), ("overlay", over), ("neutral_tilt", tilt))},
+           "dm_neutral_tilt": dm_test(tilt.loc[post], base.loc[post]),
            "pre_live_sharpe": sharpe(base.loc[pre]),
            "full_sharpe_overlay_delevered": sharpe(pd.concat([over.loc[pre], over.loc[post] * k])),
            "dm_stat": dm, "p_value": pv,
