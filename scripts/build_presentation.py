@@ -576,14 +576,15 @@ notes(s, "[2:00] Robustness evidence. The risk-scaled portfolio (S4) with exactl
 
 # 19. dLTM
 s = content_slide("Extension: sizing by market-memory regime (dLTM)", "4 · Extensions")
-text(s, 0.6, 1.7, 12.1, 0.75, "Same system on a sector-balanced 30-name S&P 500 universe, 2000–2025. Scale positions "
-     "×1.5 when memory is high (d ≥ 0.7), ×0.5 when low (d < 0.3). Parameters fixed ex ante; dLTM live from 2011.",
+text(s, 0.6, 1.62, 12.1, 0.85, "Same final system, applied to 30 S&P 500 stocks (3 per sector; dLTM only exists for "
+     "equities), 2000–2025. Base Sharpe 0.82 — below the futures 1.04 because single stocks diversify less. "
+     "Positions ×1.5 when memory is high (d ≥ 0.7), ×0.5 when low (d < 0.3); dLTM live from 2011.",
      14, GRAY)
 table(s, 0.6, 2.55, 6.3, [
     ("A/B pair (dLTM-live, 2011–25)", "Sharpe", "DM stat", "p-value"),
     ("Final → + dLTM", "0.783 → 0.794", "+2.95", "0.003"),
 ], col_w=[2.6, 1.5, 1.1, 1.1], size=13, row_h=0.5)
-bullets(s, 0.6, 4.2, 6.3, 2.7, [
+bullets(s, 0.6, 3.85, 6.3, 2.9, [
     "Higher Sharpe where dLTM is live (2011–25)",
     "Caveat: high-d days outnumber low-d 8 to 1, so the overlay adds leverage (vol 13% → 17%); DM tests "
     "return, so part of its significance is leverage",
@@ -599,7 +600,9 @@ notes(s, "[2:30] Add-on from my dLTM research. dLTM estimates long memory from t
          "partly measures leverage; the risk-adjusted lift is about +0.01 to +0.02. Second, the full 2000–2025 "
          "Sharpe dips (0.816 to 0.805) because nothing changes before 2011 and the extra leverage after 2011 gives "
          "the weaker period more weight; de-levered to the base's vol, the full-period Sharpe is 0.823, above the "
-         "base. The cost: 2022 rate hikes (-0.29), when high memory coincided with stress.")
+         "base. The cost: 2022 rate hikes (-0.29), when high memory coincided with stress. If asked why the base "
+         "is 0.82 rather than 1.04: same code, different universe — 30 US stocks all load on the S&P, so they "
+         "diversify far less than 31 futures across six asset classes.")
 
 # =========================================================================
 section_slide("05", "Limitations & recommendations", "What the backtest cannot tell us, and how to run it live")
