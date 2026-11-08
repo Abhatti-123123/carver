@@ -688,9 +688,11 @@ bullets(s, 6.88, 2.45, 5.85, 4.5, [
 ], 14, 7)
 notes(s, "[2:30] Volunteer the weaknesses before the panel finds them. The biggest two: data quality (Yahoo, "
          "approximate roll handling), chosen because the work must use public data, and costs (a flat 5 bp with no "
-         "per-market spreads or contract rounding). Expect the question of why 1.04 beats most real trend-following funds, which "
-         "run well below 1 over long periods: realistic per-market costs, capacity and a broader universe would all pull it "
-         "down.")
+         "per-market spreads or contract rounding). Expect the question of why 1.04 beats real trend-following funds. "
+         "The SG Trend Index has a long-run Sharpe of about 0.42-0.47 since 2000, net of fees (ReSolve Asset "
+         "Management; Price Action Lab, data to 2023); a fee-free replication of the same index reaches about 0.72 "
+         "(ReSolve). This backtest is gross of fees and leaves out per-market costs and capacity, so the gap is mostly "
+         "fees, costs and scale, not a better signal.")
 
 # 22. Recommendations
 s = content_slide("Recommendations", "5 · Recommendations")
