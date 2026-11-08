@@ -89,7 +89,7 @@ def notes(slide, s):
 def footer(slide):
     global slide_no
     slide_no += 1
-    text(slide, 0.6, 7.05, 8, 0.3, "Carver-style systematic futures  ·  Angad Bhatti", 10, MUTED)
+    text(slide, 0.6, 7.05, 8, 0.3, "Risk-aware systematic portfolio  ·  Angad Bhatti", 10, MUTED)
     text(slide, W - 1.6, 7.05, 1.0, 0.3, str(slide_no), 10, MUTED, align=PP_ALIGN.RIGHT)
 
 
@@ -217,32 +217,37 @@ def bar_chart(s, x, y, w, h, cats, vals, title, fmt_axis='0.0;-0.0;0', fmt_lbl='
 s = prs.slides.add_slide(BLANK)
 rect(s, 0, 0, W, 7.5, NAVY)
 rect(s, 0.9, 2.2, 0.08, 2.3, BLUE)
-text(s, 1.2, 2.1, 11, 1.6, "Why Diversification Matters —\nand How to Build It", 46, WHITE, bold=True)
-text(s, 1.2, 3.85, 11, 0.6, "A Carver-style systematic futures portfolio across 31 markets, 2005–2025", 22, LIGHT)
+text(s, 1.2, 1.95, 11.5, 1.7, "Building a Risk-Aware Systematic Portfolio:\nFrom Market Signals to Regime Intelligence",
+     38, WHITE, bold=True)
+text(s, 1.2, 3.85, 11.5, 0.9, "A Carver-style futures portfolio across 31 markets, 2005–2025, with a long-memory "
+     "regime layer", 20, LIGHT)
 text(s, 1.2, 5.6, 11, 0.4, "Angad Bhatti", 18, WHITE, bold=True)
 slide_no += 1
 notes(s, "[0:30] Introduce yourself and the project: a replication and extension of Robert Carver's "
-         "Advanced Futures Trading Strategies, built on public Yahoo Finance data. The question running through "
-         "the talk: why does diversification drive risk-adjusted returns, and how do you build it in practice?")
+         "Advanced Futures Trading Strategies, built on public Yahoo Finance data, extended with a regime layer from my "
+         "long-memory research. The question running through the talk: how do you build a portfolio that controls "
+         "its risk first, and then lets market regimes decide how much risk to take?")
 
 # 2. Thesis + agenda
-s = content_slide("The thesis: diversified risk, not a better signal", "Why we are here")
+s = content_slide("The thesis: risk first, then regimes decide how much", "Why we are here")
 bullets(s, 0.6, 1.8, 6.4, 4.8, [
-    "Any single market or signal has long losing stretches",
-    "Combining many lowly-correlated return streams raises Sharpe without raising risk",
-    "Higher Sharpe is what lets you lever up safely — return follows risk-adjusted quality",
-    "Diversification is engineered: universe choice, volatility scaling, covariance, trend sizing",
+    "Any single market or signal has long losing stretches: diversify and size by risk first",
+    "Combining lowly-correlated markets raises Sharpe without raising risk",
+    "Regime signals then set how much risk to take: trend state per market, market memory for the whole book",
+    "Every layer is judged by what it adds over the simpler version, not by its own backtest",
 ], 18, 12)
 rect(s, 7.6, 1.8, 5.13, 4.7, PANEL)
 text(s, 7.9, 2.0, 4.6, 0.4, "AGENDA", 13, BLUE, bold=True)
-for i, a in enumerate(["Universe & system", "Results", "How diversification is built", "Robustness & extensions",
+for i, a in enumerate(["Universe & system", "Results", "How the portfolio is built", "Regime intelligence & robustness",
                        "Limitations & recommendations", "Personal analysis"]):
     yy = 2.55 + i * 0.62
     text(s, 7.9, yy, 0.5, 0.5, str(i + 1), 20, BLUE, bold=True)
     text(s, 8.4, yy + 0.03, 4.1, 0.5, a, 18, INK)
-notes(s, "[1:30] Set up the argument. The goal was never to maximise backtest return; it was to understand how "
-         "data, volatility estimation, sizing, diversification and trend filters interact to shape Sharpe, "
-         "drawdown and tails. Walk through the agenda: approach, results, then limitations.")
+notes(s, "[1:30] Set up the argument. The goal was never to maximise backtest return; it was to build a portfolio "
+         "that is risk-aware by construction. First the risk machinery: volatility scaling, diversification, "
+         "covariance-aware sizing. Then regime intelligence: trend state decides how much risk each market gets, "
+         "and market-wide memory flags when the whole book faces a fat left tail. Walk through the agenda: "
+         "approach, results, then limitations.")
 
 # 3. Universe
 s = content_slide("The universe: 31 liquid futures across 6 asset classes", "1 · Universe")
@@ -509,7 +514,7 @@ notes(s, "[2:00] Regress monthly returns of the final system on the risk-scaled 
          "incremental alpha against the simpler version, not by its standalone backtest.")
 
 # =========================================================================
-section_slide("03", "How diversification is built",
+section_slide("03", "How the portfolio is built",
               "Each layer in detail: from one market to a risk-balanced, trend-aware portfolio")
 
 # 13. S1-S3
@@ -578,7 +583,10 @@ notes(s, "[2:30] The key concept slide. Same final system, four universes. 21 to
          "Sharpe slips to 1.01. Adding eight more commodities raises effective bets to 33, but several are near-"
          "copies (mini crude, mini gas) or thin (butter, milk), so Sharpe only matches the base. With average "
          "correlation already near 0.07, the formula says the gain from markets 31 to 35 is about 4% at most. "
-         "Diversification multiplies an edge; it cannot create one.")
+         "Diversification multiplies an edge; it cannot create one. If asked whether the universe was picked after "
+         "seeing results: the 35-market test is what revealed the principle, but the principle is economic — a "
+         "long-biased book only earns where markets drift — which is why the deck shows all three universes, not "
+         "just the winner.")
 
 # 16. S6/7
 s = content_slide("S6/7: deploy the risk budget where trends are", "3 · How")
@@ -598,7 +606,7 @@ notes(s, "[2:00] Trend sizing decides how much of the diversified risk budget ea
          "ever shorting. Allowing shorts on the same signal cut Sharpe in every test (1.02 to 0.63).")
 
 # =========================================================================
-section_slide("04", "Robustness & extensions", "Does the machinery hold up outside the universe it was built on?")
+section_slide("04", "Regime intelligence & robustness", "Does the machinery transfer, and how should regime signals be used?")
 
 # 18. Crypto
 s = content_slide("Robustness: same parameters, new universe", "4 · Robustness")
@@ -625,7 +633,7 @@ notes(s, "[2:00] Robustness evidence. The risk-scaled portfolio (S4) with exactl
          "is why crypto is shown with the risk machinery alone.")
 
 # 19. Using dLTM
-s = content_slide("Using it: de-risk the futures book, tilt the stock book", "4 · Extensions")
+s = content_slide("Using it: de-risk the futures book, tilt the stock book", "4 · Regime intelligence")
 text(s, 0.6, 1.75, 5.9, 0.5, "Futures: halve the book when memory is high", 18, NAVY, bold=True)
 table(s, 0.6, 2.35, 5.9, [
     ("Final system, 2013–25", "As is", "De-risked"),
@@ -664,8 +672,8 @@ s = content_slide(two_col_title, "5 · Limitations")
 text(s, 0.6, 1.75, 5.85, 0.5, "Data and costs", 19, NAVY, bold=True)
 rect(s, 0.6, 2.25, 0.9, 0.05, BLUE)
 bullets(s, 0.6, 2.45, 5.85, 4.5, [
-    "Yahoo front-month series; roll days neutralised from an exchange calendar — an approximation of true "
-    "back-adjustment, which needs individual contract prices",
+    "Public data by design (Yahoo front-month series); roll gaps neutralised from an exchange roll calendar "
+    "rather than full contract-level back-adjustment",
     "Flat 5 bp cost on every market: too harsh for Treasuries, too light for thin softs and dairy",
     "Only markets Yahoo still lists back to 2005 — survivorship, and no non-US equity indices",
     "Crypto sample is under three years",
@@ -673,15 +681,16 @@ bullets(s, 0.6, 2.45, 5.85, 4.5, [
 text(s, 6.88, 1.75, 5.85, 0.5, "Method and model", 19, NAVY, bold=True)
 rect(s, 6.88, 2.25, 0.9, 0.05, BLUE)
 bullets(s, 6.88, 2.45, 5.85, 4.5, [
-    "Settings chosen in-sample, but many variants were tried — the out-of-sample window was seen more than once",
-    "The 31-market universe was chosen after comparing earlier universes: some look-ahead",
+    "Settings are fixed once on 2005–16 rather than re-estimated as new data arrive",
     "Long-biased: sudden gap-down crashes hit before slow trends react (COVID –9.5%, skew –0.7)",
     "dLTM evidence: 13 years; high-memory months mostly in 2014–20",
     "No carry strategies; no slippage or capacity model",
 ], 14, 7)
 notes(s, "[2:30] Volunteer the weaknesses before the panel finds them. The biggest two: data quality (Yahoo, "
-         "approximate roll handling) and selection (we tried many settings and compared universes before settling). "
-         "The in-sample/out-of-sample split is the defence, but it is not a clean one.")
+         "approximate roll handling), chosen because the work must use public data, and costs (a flat 5 bp with no "
+         "per-market spreads or contract rounding). Expect the question of why 1.04 beats most real trend-following funds, which "
+         "run well below 1 over long periods: realistic per-market costs, capacity and a broader universe would all pull it "
+         "down.")
 
 # 22. Recommendations
 s = content_slide("Recommendations", "5 · Recommendations")
@@ -784,8 +793,8 @@ two_col("Experiment log: what the backtests showed",
 s = prs.slides.add_slide(BLANK)
 rect(s, 0, 0, W, 7.5, NAVY)
 text(s, 0.9, 2.6, 11.5, 1.0, "Questions", 48, WHITE, bold=True)
-text(s, 0.9, 3.7, 11.5, 1.2, "Diversification is engineered: a universe with real edge, honest risk estimates,\n"
-     "covariance-aware sizing, and trend overlays judged by incremental alpha.", 20, LIGHT)
+text(s, 0.9, 3.7, 11.5, 1.2, "Risk-aware by construction: diversify and size by risk, let trend and market-memory\n"
+     "regimes set how much risk to take, and judge every layer by what it adds.", 20, LIGHT)
 text(s, 0.9, 5.6, 11.5, 0.4, "github.com/Abhatti-123123/carver", 16, RGBColor(0x8F, 0xB8, 0xEC))
 notes(s, "Close by restating the thesis in one sentence, then open for questions.")
 
