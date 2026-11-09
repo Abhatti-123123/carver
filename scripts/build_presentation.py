@@ -279,36 +279,42 @@ notes(s, "[2:30] The foundation of diversification. Explain each class's economi
          "gaps are not booked as P&L.")
 
 # 4. System overview
-s = content_slide("The system in one picture: five steps, one risk budget", "1 · Universe & system")
-steps = [("S1", "Buy & hold", "Baseline: one fixed position per market"),
-         ("S2", "Constant vol target", "Size each market to a fixed risk"),
-         ("S3", "Variable vol target", "Blend fast & slow vol to adapt"),
-         ("S4", "Portfolio risk parity", "Correlation-aware: diversification core"),
-         ("S6/7", "Trend strength", "Size longs by trend strength; no shorts")]
+s = content_slide("The system: risk layers that each read a market regime", "1 · Universe & system")
+steps = [("S1", "Buy & hold", "Baseline: one fixed position per market", "NO REGIME VIEW"),
+         ("S2", "Constant vol target", "Size each market to a fixed risk", "VOLATILITY REGIME"),
+         ("S3", "Variable vol target", "Blend fast & slow vol to adapt", "VOLATILITY REGIME"),
+         ("S4", "Portfolio risk parity", "Correlation-aware: diversification core", "CORRELATION REGIME"),
+         ("S6/7", "Trend strength", "Size longs by trend strength; no shorts", "TREND REGIME")]
 gap = 0.146
 bw = (12.13 - gap * (len(steps) - 1)) / len(steps)
-for i, (tag, name, desc) in enumerate(steps):
+for i, (tag, name, desc, regime) in enumerate(steps):
     x = 0.6 + i * (bw + gap)
     core = tag == "S4"
     rect(s, x, 1.75, bw, 2.75, NAVY if core else PANEL)
     text(s, x + 0.18, 1.9, bw - 0.3, 0.5, tag, 24, WHITE if core else BLUE, bold=True)
-    text(s, x + 0.18, 2.5, bw - 0.3, 0.9, name, 16, WHITE if core else NAVY, bold=True)
-    text(s, x + 0.18, 3.35, bw - 0.3, 1.1, desc, 13, LIGHT if core else GRAY)
+    text(s, x + 0.18, 2.45, bw - 0.3, 0.8, name, 16, WHITE if core else NAVY, bold=True)
+    text(s, x + 0.18, 3.05, bw - 0.3, 0.9, desc, 13, LIGHT if core else GRAY)
+    text(s, x + 0.18, 4.05, bw - 0.3, 0.35, regime, 10, LIGHT if core else BLUE, bold=True)
 rect(s, 0.6, 4.7, 12.13, 0.04, BLUE)
-text(s, 0.6, 4.82, 4, 0.4, "Single-market risk control", 13, GRAY, bold=True)
-text(s, 4.7, 4.82, 4, 0.4, "Portfolio diversification", 13, BLUE, bold=True, align=PP_ALIGN.CENTER)
-text(s, 8.73, 4.82, 4, 0.4, "Signal-aware sizing", 13, GRAY, bold=True, align=PP_ALIGN.RIGHT)
+text(s, 0.6, 4.82, 4, 0.4, "Volatility regime → position size", 13, GRAY, bold=True)
+text(s, 4.7, 4.82, 4, 0.4, "Correlation regime → book size", 13, BLUE, bold=True, align=PP_ALIGN.CENTER)
+text(s, 8.73, 4.82, 4, 0.4, "Trend regime → where risk goes", 13, GRAY, bold=True, align=PP_ALIGN.RIGHT)
 rect(s, 0.6, 5.45, 12.13, 1.3, PANEL)
 for i, (k, d) in enumerate([
         ("Sharpe ratio", "Return per unit of risk, no risk-free deduction: futures returns are already excess returns."),
         ("Vol target", "The risk dial: scales every position up or down. Changes return and drawdown, not Sharpe."),
-        ("Final system", "S6/7 on top of S4, 31 markets; settings chosen on 2005–16 data only.")]):
+        ("Regime layers", "Final system (S6/7 on S4) reacts to vol, correlation and trend regimes; market memory "
+         "adds a predictive layer.")]):
     x = 0.85 + i * 4.0
     text(s, x, 5.58, 3.7, 0.35, k.upper(), 11, BLUE, bold=True)
     text(s, x, 5.9, 3.7, 0.8, d, 12, INK)
-notes(s, "[2:30] Give the audience the vocabulary before the numbers. S1–S3 control risk one market at a time. "
-         "S4 is where diversification becomes explicit through the covariance matrix. S6/7 decides how much "
-         "of that diversified risk budget to deploy, based on trend strength. Every layer is a buy-and-hold variant: the "
+notes(s, "[2:30] Give the audience the vocabulary before the numbers. Read the slide as a stack of regime models. "
+         "S2 and S3 read each market's volatility regime and set position size: smaller when a market turns wild, "
+         "larger when it calms. S4 reads the correlation regime: when markets start moving together, as in a crisis, "
+         "measured portfolio risk rises and the whole book is scaled down. S6/7 reads each market's trend regime "
+         "and decides where the risk budget goes. These layers react to the regime the market is in; later, market "
+         "memory adds a predictive layer that flags fat left tails before they arrive. The final system is S6/7 on "
+         "S4, with settings chosen on 2005-16 data only. Every layer is a buy-and-hold variant: the "
          "book stays invested and layers only change how much is held. Carry strategies (S8+) were left out for "
          "lack of data.")
 
@@ -336,7 +342,11 @@ notes(s, "[2:30] Lead with the headline: 31 futures, 2005 to mid-2025, roll days
          "Sharpe 1.04 over twenty years and 1.48 since 2020. Settings were chosen on 2005–2016 only, and the "
          "untouched 2017–2025 window did better (1.23), so this is not a fitted number. Crypto column: the risk-scaled "
          "portfolio (S4) on 12 liquid coins, 2023–2025, with the futures parameters unchanged. Footnote: no risk-free deduction "
-         "because the futures price already embeds financing (F ≈ S × (1 + r − yield)).")
+         "because the futures price already embeds financing (F ≈ S × (1 + r − yield)). Benchmark context: the SG "
+         "Trend Index has a long-run Sharpe of about 0.42-0.47 since 2000, net of fees (ReSolve Asset Management; "
+         "Price Action Lab, data to 2023), and a fee-free replication of it reaches about 0.72 (ReSolve). These "
+         "results are after 5 bp trading costs but, like any backtest, before management and performance fees, so "
+         "the fee-free replication is the fair comparison.")
 
 # 6. Strategy ladder
 s = content_slide("Each layer changes something different", "2 · Results")
@@ -688,11 +698,8 @@ bullets(s, 6.88, 2.45, 5.85, 4.5, [
 ], 14, 7)
 notes(s, "[2:30] Volunteer the weaknesses before the panel finds them. The biggest two: data quality (Yahoo, "
          "approximate roll handling), chosen because the work must use public data, and costs (a flat 5 bp with no "
-         "per-market spreads or contract rounding). Expect the question of why 1.04 beats real trend-following funds. "
-         "The SG Trend Index has a long-run Sharpe of about 0.42-0.47 since 2000, net of fees (ReSolve Asset "
-         "Management; Price Action Lab, data to 2023); a fee-free replication of the same index reaches about 0.72 "
-         "(ReSolve). This backtest is gross of fees and leaves out per-market costs and capacity, so the gap is mostly "
-         "fees, costs and scale, not a better signal.")
+         "per-market spreads or contract rounding). Real per-market costs would be lower for Treasuries and index "
+         "futures and higher for thin softs and dairy.")
 
 # 22. Recommendations
 s = content_slide("Recommendations", "5 · Recommendations")
