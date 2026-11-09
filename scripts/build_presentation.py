@@ -233,7 +233,7 @@ s = content_slide("The thesis: risk first, then regimes decide how much", "Why w
 bullets(s, 0.6, 1.8, 6.4, 4.8, [
     "Any single market or signal has long losing stretches: diversify and size by risk first",
     "Combining lowly-correlated markets raises Sharpe without raising risk",
-    "Regime signals then set how much risk to take: trend state per market, market memory for the whole book",
+    "Regime signals then decide where risk goes: trend state and long memory, asset by asset",
     "Every layer is judged by what it adds over the simpler version, not by its own backtest",
 ], 18, 12)
 rect(s, 7.6, 1.8, 5.13, 4.7, PANEL)
@@ -246,7 +246,7 @@ for i, a in enumerate(["Universe & system", "Results", "How the portfolio is bui
 notes(s, "[1:30] Set up the argument. The goal was never to maximise backtest return; it was to build a portfolio "
          "that is risk-aware by construction. First the risk machinery: volatility scaling, diversification, "
          "covariance-aware sizing. Then regime intelligence: trend state decides how much risk each market gets, "
-         "and market-wide memory flags when the whole book faces a fat left tail. Walk through the agenda: "
+         "and long memory flags which assets carry fat left tails. Walk through the agenda: "
          "approach, results, then limitations.")
 
 # 3. Universe
@@ -283,7 +283,7 @@ s = content_slide("The system: risk layers that each read a market regime", "1 �
 steps = [("S1", "Buy & hold", "Baseline: one fixed position per market", "NO REGIME VIEW"),
          ("S2", "Constant vol target", "Size each market to a fixed risk", "VOLATILITY REGIME"),
          ("S3", "Variable vol target", "Blend fast & slow vol to adapt", "VOLATILITY REGIME"),
-         ("S4", "Portfolio risk parity", "Correlation-aware: diversification core", "CORRELATION REGIME"),
+         ("S4", "Portfolio risk parity", "Correlation-aware: diversification core", "VOL + CORRELATION REGIME"),
          ("S6/7", "Trend strength", "Size longs by trend strength; no shorts", "TREND REGIME")]
 gap = 0.146
 bw = (12.13 - gap * (len(steps) - 1)) / len(steps)
@@ -303,8 +303,8 @@ rect(s, 0.6, 5.45, 12.13, 1.3, PANEL)
 for i, (k, d) in enumerate([
         ("Sharpe ratio", "Return per unit of risk, no risk-free deduction: futures returns are already excess returns."),
         ("Vol target", "The risk dial: scales every position up or down. Changes return and drawdown, not Sharpe."),
-        ("Regime layers", "Final system (S6/7 on S4) reacts to vol, correlation and trend regimes; market memory "
-         "adds a predictive layer.")]):
+        ("Regime layers", "Final system (S6/7 on S4) reacts to vol, correlation and trend regimes; long memory "
+         "adds an asset-level skew signal.")]):
     x = 0.85 + i * 4.0
     text(s, x, 5.58, 3.7, 0.35, k.upper(), 11, BLUE, bold=True)
     text(s, x, 5.9, 3.7, 0.8, d, 12, INK)
@@ -312,8 +312,8 @@ notes(s, "[2:30] Give the audience the vocabulary before the numbers. Read the s
          "S2 and S3 read each market's volatility regime and set position size: smaller when a market turns wild, "
          "larger when it calms. S4 reads the correlation regime: when markets start moving together, as in a crisis, "
          "measured portfolio risk rises and the whole book is scaled down. S6/7 reads each market's trend regime "
-         "and decides where the risk budget goes. These layers react to the regime the market is in; later, market "
-         "memory adds a predictive layer that flags fat left tails before they arrive. The final system is S6/7 on "
+         "and decides where the risk budget goes. These layers react to the regime each market is in; later, long "
+         "memory adds a forward-looking signal for which assets carry fat left tails. The final system is S6/7 on "
          "S4, with settings chosen on 2005-16 data only. Every layer is a buy-and-hold variant: the "
          "book stays invested and layers only change how much is held. Carry strategies (S8+) were left out for "
          "lack of data.")
@@ -432,57 +432,7 @@ text(s, 0.6, 5.65, 12.1, 1.1,
      "contained; fat tails mean risk is judged with VaR/CVaR, not variance alone.", 15, INK)
 notes(s, "[1:30] Daily returns of the final system. Skew -0.7 and kurtosis 6: the left tail comes from gap events "
          "like March 2020, before a slow trend signal can respond. Hit rate 55% with symmetric up and down days — "
-         "a small daily edge, compounded across 31 markets. Transition: can we see the bad tail coming?")
-
-# 10a. Market memory predicts the left tail
-s = content_slide("Market memory predicts when our left tail is fat", "2 · Results")
-table(s, 0.6, 1.8, 6.3, [
-    ("Market memory state", "Months", "Skew", "Worst month", "Sharpe"),
-    ("Low", "55", "–0.43", "–4.4%", "1.82"),
-    ("Mid", "53", "–0.73", "–6.9%", "0.67"),
-    ("High", "41", "–1.42", "–11.2%", "0.77"),
-], col_w=[2.1, 1.0, 1.0, 1.2, 1.0], size=13, row_h=0.5)
-text(s, 0.6, 3.85, 6.3, 0.4, "Next month of the final system, 2013–25, by market memory at month-end.", 11, MUTED)
-bullets(s, 0.6, 4.35, 6.3, 2.5, [
-    "State = average dLTM (d*) across ~460 S&P 500 stocks, vs its own 1-year average; thresholds use only past data",
-    "High memory has the most negative skew under all three definitions, and without the COVID months",
-    "It predicts tail risk, not returns: Sharpe is not monotonic across states",
-], 13, 7)
-cd = CategoryChartData()
-cd.categories = ["Low memory", "Mid", "High memory"]
-for lab, vals in (("Detrended (headline)", (-0.43, -0.73, -1.42)), ("Expanding terciles", (-0.22, -0.68, -1.07)),
-                  ("Rolling 3-year terciles", (-0.43, -0.68, -1.51))):
-    cd.add_series(lab, vals)
-ch = s.shapes.add_chart(XL_CHART_TYPE.COLUMN_CLUSTERED, Inches(7.2), Inches(1.65), Inches(5.53), Inches(5.1), cd).chart
-style_chart(ch)
-ch.has_title = True
-ch.chart_title.text_frame.text = "Next-month skew of the final system"
-run = ch.chart_title.text_frame.paragraphs[0].runs[0]
-run.font.size, run.font.bold, run.font.color.rgb = Pt(13), True, NAVY
-ch.legend.position = XL_LEGEND_POSITION.BOTTOM
-ch.value_axis.minimum_scale, ch.value_axis.maximum_scale = -1.6, 0
-ch.value_axis.tick_labels.number_format = '0.0;-0.0;0'
-ch.value_axis.tick_labels.number_format_is_linked = False
-ch.category_axis.tick_label_position = XL_TICK_LABEL_POSITION.HIGH
-plot = ch.plots[0]
-plot.gap_width, plot.overlap = 70, -8
-plot.has_data_labels = True
-plot.data_labels.number_format, plot.data_labels.number_format_is_linked = '+0.00;-0.00;0', False
-plot.data_labels.position = XL_LABEL_POSITION.OUTSIDE_END
-plot.data_labels.font.size, plot.data_labels.font.color.rgb = Pt(10), INK
-for ser, col in zip(plot.series, (BLUE, ORANGE, NAVY)):
-    ser.invert_if_negative = False
-    ser.format.fill.solid()
-    ser.format.fill.fore_color.rgb = col
-notes(s, "[2:30] The previous slide showed our weakness: negative skew from sudden crashes. Can we see the bad tail "
-         "coming? This is where my dLTM research comes in. dLTM estimates long memory in a price series from the tail "
-         "of its autocorrelation function; my research found that high-memory regimes are followed by more negative "
-         "skew. Here I average each S&P 500 stock's walk-forward d* into one market memory state, measure it against "
-         "its own one-year average so a slow drift cannot drive the result, and bucket it into thirds using only "
-         "past data. In high-memory months, the next month of our futures book has skew of -1.42 versus -0.43 when "
-         "memory is low, and the worst month is -11% versus -4%. The ranking holds under all three definitions and "
-         "with the COVID months removed. The honest framing: it tells you when the left tail is fat, not where "
-         "returns go — and tail risk is exactly what a risk-scaled system needs to know.")
+         "a small daily edge, compounded across 31 markets.")
 
 # 10. Regimes
 s = content_slide("By regime: steps aside in slow bears, caught by sudden crashes", "2 · Results")
@@ -642,36 +592,52 @@ notes(s, "[2:00] Robustness evidence. The risk-scaled portfolio (S4) with exactl
          "that 2.9 years is short; the slow trend-strength layer needs more history than that to warm up, which "
          "is why crypto is shown with the risk machinery alone.")
 
-# 19. Using dLTM
-s = content_slide("Using it: de-risk the futures book, tilt the stock book", "4 · Regime intelligence")
-text(s, 0.6, 1.75, 5.9, 0.5, "Futures: halve the book when memory is high", 18, NAVY, bold=True)
-table(s, 0.6, 2.35, 5.9, [
-    ("Final system, 2013–25", "As is", "De-risked"),
-    ("Sharpe", "1.14", "1.19"), ("Skew", "–0.85", "–0.56"), ("Max drawdown", "–26.9%", "–16.9%"),
-    ("CAGR", "13.2%", "11.9%"), ("Volatility", "11.5%", "9.9%"),
-], col_w=[2.5, 1.7, 1.7], size=13, row_h=0.45, highlight_col=2)
-text(s, 0.6, 5.1, 5.9, 0.9, "All three state definitions: drawdown –27% → –14% to –17%, Sharpe +0.03 to +0.12. "
-     "Lower CAGR only because the book runs less risk on average.", 12, MUTED)
-text(s, 6.83, 1.75, 5.9, 0.5, "Stocks: tilt toward high-memory names", 18, NAVY, bold=True)
-table(s, 6.83, 2.35, 5.9, [
+# 19a. Memory predicts asset-level skew
+s = content_slide("Memory predicts which assets carry fat left tails", "4 · Regime intelligence")
+table(s, 0.6, 1.8, 7.0, [
+    ("Same-date cross-section, S&P 500, 2011–25", "Average", "t-stat", "Months < 0"),
+    ("Slope of next-month skew on memory (d*)", "–0.124", "–4.58", "64%"),
+    ("High-memory minus low-memory stocks", "–0.046", "–4.14", "64%"),
+    ("… 2011–2019 only", "–0.037", "–2.44", ""),
+    ("… 2020–2025 only", "–0.059", "–3.35", ""),
+], col_w=[3.7, 1.1, 1.1, 1.1], size=13, row_h=0.5)
+text(s, 0.6, 4.4, 7.0, 0.6, "Each month, every stock's forward 21-day skew is compared with its memory on the same date "
+     "(Fama–MacBeth, Newey–West t-stats), so the calendar era cannot drive the result.", 11, MUTED)
+rect(s, 8.0, 1.8, 4.73, 4.6, PANEL)
+text(s, 8.3, 2.0, 4.2, 0.4, "WHAT IT SAYS", 12, BLUE, bold=True)
+bullets(s, 8.3, 2.45, 4.2, 3.9, [
+    "Higher-memory assets have more negative forward skew than lower-memory assets in the same month",
+    "Significant in both halves of the sample, stronger since 2020",
+    "Memory is an asset-level signal: it says which assets carry fat left tails, not when the whole market will",
+], 14, 10)
+notes(s, "[2:30] This is where my long-memory research comes in. dLTM estimates long memory in a price series from the "
+         "tail of its autocorrelation function; my research found that high-memory regimes are followed by more "
+         "negative skew. The clean test is cross-sectional: every month, compare stocks with high and low memory on "
+         "the same date. High-memory stocks have more negative next-month skew, with t-statistics of -4.6 overall and "
+         "significant in both 2011-19 and 2020-25, so this is not an artefact of one period. The signal is about which "
+         "assets carry tail risk, which tells us how to use it: as a cross-sectional tilt, not a market-timing switch.")
+
+# 19b. Using it
+s = content_slide("Using it: tilt risk toward high-memory assets", "4 · Regime intelligence")
+table(s, 0.6, 1.8, 6.6, [
     ("30 S&P 500 stocks, 2011–25", "Sharpe", "Volatility"),
     ("Final system (base)", "0.783", "13.2%"),
-    ("×1.5 / ×0.5 by memory (levered)", "0.794", "17.1%"),
-    ("Same, leverage-neutral tilt", "0.809", "13.7%"),
-], col_w=[3.3, 1.3, 1.3], size=13, row_h=0.45, highlight_col=1)
-bullets(s, 6.83, 4.3, 5.9, 2.5, [
-    "Leverage-neutral: multipliers rescaled to average 1 each day — same risk, higher Sharpe (DM +2.13, p = 0.03)",
-    "The signal works without adding leverage",
+    ("Final system + memory tilt", "0.809", "13.7%"),
+], col_w=[3.6, 1.5, 1.5], size=14, row_h=0.55, highlight_col=1)
+text(s, 0.6, 3.6, 6.6, 0.6, "Diebold–Mariano test of the daily return difference: +2.13, p = 0.03.", 12, MUTED)
+bullets(s, 7.6, 1.85, 5.13, 4.6, [
+    "Each position ×1.5 when its memory is high (d ≥ 0.7), ×0.5 when low (d < 0.3)",
+    "Rescaled every day to average 1 across names: total risk is unchanged, so the gain is the signal, not leverage",
+    "Higher Sharpe at the same risk: the trend premium is larger where memory is high",
     "Base is 0.78, not 1.04: 30 US stocks diversify far less than 31 futures",
-], 13, 7)
-notes(s, "[2:00] Two ways to use the memory signal. In the futures book, as a risk switch: halve exposure the day after "
-         "market memory enters its top third. Sharpe is kept or slightly better, skew improves from -0.85 to -0.56 and "
-         "the maximum drawdown falls from -27% to -17%; the lower CAGR is just less risk on average. In a stock book, "
-         "where each name has its own d*, as a tilt: more risk in high-memory names, less in low-memory names, "
-         "rescaled every day so total risk is unchanged. Sharpe rises from 0.783 to 0.809 at the same volatility, "
-         "DM p = 0.03, so the gain is the signal, not leverage. The 30-stock universe is the final system on 3 names "
-         "per sector, rebuilt by a fixed rule because the original list was not kept; its base Sharpe is lower "
-         "than the futures because single stocks all load on the S&P.")
+], 15, 10)
+notes(s, "[2:00] The application that matches the evidence: a cross-sectional tilt. Each stock's position is scaled up when "
+         "its memory is high and down when it is low, then rescaled every day so the multipliers average one, so total "
+         "risk does not change. Sharpe rises from 0.783 to 0.809 at the same volatility, Diebold-Mariano p = 0.03. Trend "
+         "following is short-skew at the position level and high memory coincides with stronger persistence, so tilting "
+         "toward high-memory names harvests more of the trend premium. The 30-stock universe is the final system on "
+         "three names per sector, rebuilt by a fixed rule; its base Sharpe is lower than the futures because single "
+         "stocks all move with the S&P.")
 
 # =========================================================================
 section_slide("05", "Limitations & recommendations", "What the backtest cannot tell us, and how to run it live")
@@ -693,7 +659,7 @@ rect(s, 6.88, 2.25, 0.9, 0.05, BLUE)
 bullets(s, 6.88, 2.45, 5.85, 4.5, [
     "Settings are fixed once on 2005–16 rather than re-estimated as new data arrive",
     "Long-biased: sudden gap-down crashes hit before slow trends react (COVID –9.5%, skew –0.7)",
-    "dLTM evidence: 13 years; high-memory months mostly in 2014–20",
+    "Memory (dLTM) is so far estimated for stocks only, not for the futures",
     "No carry strategies; no slippage or capacity model",
 ], 14, 7)
 notes(s, "[2:30] Volunteer the weaknesses before the panel finds them. The biggest two: data quality (Yahoo, "
@@ -707,7 +673,7 @@ recs = [("Size longs by trend strength", "it earns the alpha over the risk-scale
         ("Add markets that bring their own edge", "21 → 31 lifted Sharpe 0.88 → 1.04; going to 35 added nothing"),
         ("Pick the vol target after Sharpe", "Sharpe is 1.04 at every target; 40% nearly doubles drawdown"),
         ("Smooth leverage, blend covariance", "avoids cutting risk at the bottom and oversizing in calm"),
-        ("Cut risk when market memory is high", "drawdown –27% → –17% with Sharpe kept"),
+        ("Tilt risk toward high-memory assets", "leverage-neutral: Sharpe 0.783 → 0.809 at the same risk"),
         ("Warm up before trading", "hold initial weights until the 120-day lookbacks are populated")]
 for i, (h, d) in enumerate(recs):
     yy = 1.8 + i * 0.84
@@ -802,8 +768,8 @@ two_col("Experiment log: what the backtests showed",
 s = prs.slides.add_slide(BLANK)
 rect(s, 0, 0, W, 7.5, NAVY)
 text(s, 0.9, 2.6, 11.5, 1.0, "Questions", 48, WHITE, bold=True)
-text(s, 0.9, 3.7, 11.5, 1.2, "Risk-aware by construction: diversify and size by risk, let trend and market-memory\n"
-     "regimes set how much risk to take, and judge every layer by what it adds.", 20, LIGHT)
+text(s, 0.9, 3.7, 11.5, 1.2, "Risk-aware by construction: diversify and size by risk, let trend and long-memory\n"
+     "regimes decide where risk goes, and judge every layer by what it adds.", 20, LIGHT)
 text(s, 0.9, 5.6, 11.5, 0.4, "github.com/Abhatti-123123/carver", 16, RGBColor(0x8F, 0xB8, 0xEC))
 notes(s, "Close by restating the thesis in one sentence, then open for questions.")
 
